@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+
+# == Imports ================================================================
+
+require 'optparse'
+
+$LOAD_PATH << File.expand_path(File.join('..', 'lib'), File.dirname(__FILE__))
+
+require 'split'
+
+# == Main ===================================================================
+
+options = {
+  chunk_size: 5,
+  limit: 1,
+  filepath: File.expand_path('../sample.csv', File.dirname(__FILE__)),
+  insert: false,
+  table: 'project_recipients'
+}
+
+parser = OptionParser.new do |parser|
+  parser.on('-c', '--chunksize=CHUNKSIZE', '') do |chunksize|
+    options[:chunk_size] = chunksize
+  end
+  parser.on('-l', '--limit=LIMIT', '') do |limit|
+    options[:limit] = limit
+  end
+  parser.on('-f', '--filename=FILENAME', '') do |filename|
+    options[:filename] = File.expand_path(filename, Dir.cwd)
+  end
+  parser.on('-i', '--insert', '') do
+    options[:insert]
+  end
+  parser.on('-t', '--table=TABLE', '') do |table|
+    options[:table] = table
+  end
+end
+
+args = parser.parse(*ARGV)
+
+split_csv = Split.new(options)
+
+split_csv.split
