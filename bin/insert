@@ -11,25 +11,17 @@ require 'split'
 # == Main ===================================================================
 
 options = {
-  chunk_size: 5,
-  limit: 1,
-  filepath: File.expand_path('../sample.csv', File.dirname(__FILE__)),
-  insert: false,
-  table: 'project_recipients'
+  table: 'project_recipients',
+  chunk_size: 10000,
+  filepath: File.expand_path('../sample.csv', File.dirname(__FILE__))
 }
 
 parser = OptionParser.new do |parser|
   parser.on('-c', '--chunksize=CHUNKSIZE', '') do |chunksize|
     options[:chunk_size] = chunksize
   end
-  parser.on('-l', '--limit=LIMIT', '') do |limit|
-    options[:limit] = limit
-  end
   parser.on('-f', '--filename=FILENAME', '') do |filename|
     options[:filename] = File.expand_path(filename, Dir.cwd)
-  end
-  parser.on('-i', '--insert', '') do
-    options[:insert]
   end
   parser.on('-t', '--table=TABLE', '') do |table|
     options[:table] = table

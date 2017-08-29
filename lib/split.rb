@@ -6,7 +6,6 @@ class Split
   # == Instance Methods =====================================================
   def initialize(options)
     @chunksize = options[:chunk_size].to_i
-    @limit = options[:limit].to_i
     @filepath = options[:filepath]
     @temp_file_path = '../chunk.csv'
     @db = DatabaseConnection.connect
@@ -22,14 +21,22 @@ class Split
     # create a temp table to hold data
     @db.query("CREATE TEMPORARY TABLE temp_%s LIKE %s" % [@table, @table])
 
-    File.open(@filepath).each_line.each_slice(@chunksize) do |rows|
-      File.open(@temp_file_path, 'w') do |chunk|
-        @db.query("TRUNCATE TABLE temp_%s" % @table)
-        chunk.write(rows.join)
-        chunk.close
-        insert
+    chunks = size
+
+    File.open(@filepath) do |f|
+      f = Zlib::GzipReader.new(f) if not @filepath.include? 'csv'
+      f.each_line.each_slice(@chunksize).with_index(1) do |rows, i|
+        puts "Inserting chunk %s/%s" % [i, chunks]
+        File.open(@temp_file_path, 'w') do |chunk|
+          @db.query("TRUNCATE TABLE temp_%s" % @table)
+          chunk.write(rows.join)
+          chunk.close
+          insert
+        end
       end
     end
+
+    puts 'Finish'
   end
 
   def insert
@@ -51,6 +58,17 @@ class Split
         c: columns
       }
     )
+  end
+
+
+  def size
+    size = File.open(@filepath).readlines.size
+
+    if size < @chunksize
+      1
+    else
+      (size / @chunksize).ceil
+    end
   end
 
   def min(attribute)

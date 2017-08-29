@@ -44,7 +44,11 @@ class DatabaseConnection
     end
   end
 
+  def self.runtime_environment(env=nil)
+    env or 'development'
+  end
+
   def self.connect
-    Mysql2::Client.new(self.config)
+    Mysql2::Client.new(self.config[self.runtime_environment])
   end
 end
