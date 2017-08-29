@@ -49,6 +49,15 @@ class Split
     nil
   end
 
+  def open_csv(path, &block)
+    case path
+    when /\.gz\z/
+      Zlib::GzipReader.open(path, &block)
+    else
+      File.open(path, &block)
+    end
+  end
+
   def insert
     columns = @ruleset.keys.join(', ')
     query =
@@ -90,8 +99,7 @@ class Split
 
     chunks = size
 
-    File.open(@filepath) do |f|
-      f = Zlib::GzipReader.new(f) if not @filepath.include? 'csv'
+    open_csv(@filepath) do |f|
       f.each_line.each_slice(@chunksize).with_index(1) do |rows, i|
         puts "Inserting chunk %s/%s" % [i, chunks]
         debug do
