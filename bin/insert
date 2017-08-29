@@ -13,7 +13,8 @@ require 'split'
 options = {
   table: 'project_recipients',
   chunk_size: 10000,
-  filepath: File.expand_path('../sample.csv', File.dirname(__FILE__))
+  filepath: File.expand_path('../sample.csv', File.dirname(__FILE__)),
+  debug: false
 }
 
 parser = OptionParser.new do |parser|
@@ -25,6 +26,9 @@ parser = OptionParser.new do |parser|
   end
   parser.on('-t', '--table=TABLE', '') do |table|
     options[:table] = table
+  end
+  parser.on('-d', '--debug', '') do
+    options[:debug] = true
   end
 end
 
