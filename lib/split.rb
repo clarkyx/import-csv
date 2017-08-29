@@ -24,7 +24,7 @@ class Split
   end
 
   def size
-    size = File.open(@filepath).readlines.size
+    size = `wc -l "#{@filepath}"`.strip.split(' ')[0].to_i
 
     if size < @chunksize
       1
