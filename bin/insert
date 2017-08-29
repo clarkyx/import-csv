@@ -20,8 +20,8 @@ parser = OptionParser.new do |parser|
   parser.on('-c', '--chunksize=CHUNKSIZE', '') do |chunksize|
     options[:chunk_size] = chunksize
   end
-  parser.on('-f', '--filename=FILENAME', '') do |filename|
-    options[:filename] = File.expand_path(filename, Dir.pwd)
+  parser.on('-p', '--filepath=FILEPATH', '') do |filepath|
+    options[:filepath] = filepath
   end
   parser.on('-t', '--table=TABLE', '') do |table|
     options[:table] = table
