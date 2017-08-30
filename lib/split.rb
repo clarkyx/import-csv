@@ -11,10 +11,14 @@ class Split
     @db = DatabaseConnection.connect
     @table = options[:table]
     @debug = options[:debug]
+    @timer = options[:timer]
+
     File.open(File.expand_path("config/rules.yml")) do |f|
        @ruleset = YAML.load(f)
        @rules = @ruleset.map {|k, v| self.send(v.to_sym, k.to_s)}.compact.join(", ")
     end
+
+    @insert_rate = []
   end
 
   def debug
@@ -58,8 +62,15 @@ class Split
     end
   end
 
+  def timer(start, finished)
+    @insert_rate << @chunksize / (finished - start)
+    puts "average inserting %s per second" % (@insert_rate.reduce(:+) / @insert_rate.size if @timer).ceil if @timer
+  end
+
   def insert
     columns = @ruleset.keys.join(', ')
+
+    start = Time.now
     query =
       "LOAD DATA LOCAL INFILE '%s'
        INTO TABLE temp_%s
@@ -89,6 +100,10 @@ class Split
     end
 
     @db.query(query)
+
+    finish = Time.now
+
+    timer(start,finish) if @timer
 
   end
 

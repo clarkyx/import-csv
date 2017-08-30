@@ -14,7 +14,8 @@ options = {
   table: 'project_recipients',
   chunk_size: 10000,
   filepath: File.expand_path('../sample.csv', File.dirname(__FILE__)),
-  debug: false
+  debug: false,
+  timer: false
 }
 
 parser = OptionParser.new do |parser|
@@ -29,6 +30,9 @@ parser = OptionParser.new do |parser|
   end
   parser.on('-d', '--debug', '') do
     options[:debug] = true
+  end
+  parser.on('-i', '--timer', '') do
+    options[:timer] = true
   end
 end
 
