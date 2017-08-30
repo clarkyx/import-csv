@@ -28,7 +28,13 @@ class Split
   end
 
   def size
-    size = `wc -l "#{@filepath}"`.strip.split(' ')[0].to_i
+
+    case @filepath
+    when /\.gz\z/
+      size = `gunzip -dc "#{@filepath}" | wc -l`.strip.split(' ')[0].to_i
+    else
+      size = `wc -l "#{@filepath}"`.strip.split(' ')[0].to_i
+    end
 
     if size < @chunksize
       1
